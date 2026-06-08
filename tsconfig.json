@@ -1,14 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "module": "CommonJS",
-    "baseUrl": ".",
-    "paths": {
-      "#/*": ["src/*"]
-    },
-    "moduleResolution": "Node10",
+    // "moduleResolution": "Node",
+    // "ignoreDeprecations": "6.0",
+    "rootDir": "src",
     "outDir": "dist",
-    "importsNotUsedAsValues": "remove",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
