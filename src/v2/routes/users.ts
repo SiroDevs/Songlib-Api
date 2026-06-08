@@ -21,7 +21,7 @@ router.get('/', readLimiter, async (req: Request, res: Response, next: NextFunct
 /** GET /api/v2/users/:userId */
 router.get('/:userId', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findOne({ userId: parseInt(req.params.userId) }).select('-_id');
+    const user = await User.findOne({ userId: parseInt(req.params.userId as string) }).select('-_id');
     if (!user) {
       return ResponseUtils.notFound(res, 'User not found');
     }
@@ -64,7 +64,7 @@ router.put('/:userId', writeLimiter, async (req: Request, res: Response, next: N
     }
 
     const updated = await User.findOneAndUpdate(
-      { userId: parseInt(req.params.userId) },
+      { userId: parseInt(req.params.userId as string) },
       { ...req.body, updated: new Date() },
       { new: true, runValidators: true }
     );
@@ -85,7 +85,7 @@ router.put('/:userId', writeLimiter, async (req: Request, res: Response, next: N
 /** DELETE /api/v2/users/:userId */
 router.delete('/:userId', writeLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const deleted = await User.findOneAndDelete({ userId: parseInt(req.params.userId) });
+    const deleted = await User.findOneAndDelete({ userId: parseInt(req.params.userId as string) });
     if (!deleted) {
       return ResponseUtils.notFound(res, 'User not found');
     }
