@@ -15,7 +15,7 @@ router.use(requireApiKey);
  */
 router.get('/:songId', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const songId = parseInt(req.params.songId);
+    const songId = parseInt(req.params.songId as string);
     if (!ValidationUtils.isValidId(songId)) {
       return ResponseUtils.badRequest(res, 'Invalid songId');
     }
@@ -45,7 +45,7 @@ router.get('/:songId', readLimiter, async (req: Request, res: Response, next: Ne
  */
 router.get('/books/:bookIds', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const bookIds = ValidationUtils.parseBookIds(req.params.bookIds);
+    const bookIds = ValidationUtils.parseBookIds(req.params.bookIds as string);
     if (bookIds.length === 0) {
       return ResponseUtils.badRequest(res, 'No valid book IDs provided');
     }
@@ -128,7 +128,7 @@ router.put('/', writeLimiter, async (req: Request, res: Response, next: NextFunc
  */
 router.delete('/:songId', writeLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const songId = parseInt(req.params.songId);
+    const songId = parseInt(req.params.songId as string);
     if (!ValidationUtils.isValidId(songId)) {
       return ResponseUtils.badRequest(res, 'Invalid songId');
     }
@@ -171,7 +171,7 @@ router.post('/likes/toggle', writeLimiter, async (req: Request, res: Response, n
  */
 router.get('/likes/:userId', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = parseInt(req.params.userId as string);
     if (!ValidationUtils.isValidId(userId)) {
       return ResponseUtils.badRequest(res, 'Invalid userId');
     }

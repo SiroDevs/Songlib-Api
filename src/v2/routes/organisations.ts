@@ -21,7 +21,7 @@ router.get('/', readLimiter, async (_req: Request, res: Response, next: NextFunc
 /** GET /api/v2/organisations/:orgId */
 router.get('/:orgId', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const org = await Organisation.findOne({ orgId: parseInt(req.params.orgId) }).select('-_id');
+    const org = await Organisation.findOne({ orgId: parseInt(req.params.orgId as string) }).select('-_id');
     if (!org) {
       return ResponseUtils.notFound(res, 'Organisation not found');
     }
@@ -66,7 +66,7 @@ router.put('/:orgId', writeLimiter, async (req: Request, res: Response, next: Ne
     }
 
     const updated = await Organisation.findOneAndUpdate(
-      { orgId: parseInt(req.params.orgId) },
+      { orgId: parseInt(req.params.orgId as string) },
       { ...req.body, updated: new Date() },
       { new: true, runValidators: true }
     );
@@ -87,7 +87,7 @@ router.put('/:orgId', writeLimiter, async (req: Request, res: Response, next: Ne
 /** DELETE /api/v2/organisations/:orgId */
 router.delete('/:orgId', writeLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await Organisation.deleteOne({ orgId: parseInt(req.params.orgId) });
+    const result = await Organisation.deleteOne({ orgId: parseInt(req.params.orgId as string) });
     if (result.deletedCount === 0) {
       return ResponseUtils.notFound(res, 'Organisation not found');
     }

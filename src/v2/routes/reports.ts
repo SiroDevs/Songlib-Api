@@ -68,7 +68,7 @@ router.get('/', readLimiter, async (req: Request, res: Response, next: NextFunct
  */
 router.put('/:reportId/resolve', writeLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const reportId = parseInt(req.params.reportId);
+    const reportId = parseInt(req.params.reportId as string);
     if (!ValidationUtils.isValidId(reportId)) {
       return ResponseUtils.badRequest(res, 'Invalid reportId');
     }

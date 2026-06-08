@@ -7,7 +7,9 @@ export const swaggerOptions: Options = {
       title: 'SongLib API',
       version: '2.0.0',
       description: `
-This is the current version — it adds authentication, rate limiting, pagination, per-user likes, song error reporting, and a health check endpoint. All v1 routes remain available at \`/api/...\` unchanged.
+The SongLib backend API. **v2** is the current version — it adds authentication,
+rate limiting, pagination, per-user likes, song error reporting, and a health
+check endpoint. All v1 routes remain available at \`/api/...\` unchanged.
 
 ### Authentication
 Write operations (POST, PUT, DELETE) require an API key in the request header:
