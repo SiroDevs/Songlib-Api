@@ -11,7 +11,7 @@ router.get("/", async (_req: Request, res: Response) => {
   try {
     res.json({
       status: 200,
-      message: "Songlib api is live!",
+      message: "SongBib api is live!",
     });
   } catch (error) {
     console.error(error);
