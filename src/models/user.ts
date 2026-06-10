@@ -7,6 +7,7 @@ export interface IUser extends Document {
     email: string;
     phone: string;
     bio: string;
+    role: 'user' | 'admin';
     lastseen: Date;
     created: Date;
     updated?: Date;
@@ -43,6 +44,12 @@ const userSchema = new Schema<IUser>({
     bio: {
         type: String,
         trim: true,
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user',
+        index: true
     },
     lastseen: {
         type: Date,

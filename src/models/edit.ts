@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IEdit extends Document {
     editId: number;
+    songId: number;
     book: number;
     songNo: number;
     title: string;
@@ -9,6 +10,8 @@ export interface IEdit extends Document {
     content: string;
     key: string;
     author: string;
+    userId: number;
+    status: 'pending' | 'accepted' | 'rejected';
     views: number;
     likes: number;
     liked: boolean;
@@ -20,6 +23,11 @@ const editSchema = new Schema<IEdit>({
     editId: {
         type: Number,
         unique: true,
+        index: true
+    },
+    songId: {
+        type: Number,
+        default: 0,
         index: true
     },
     book: {
@@ -35,7 +43,6 @@ const editSchema = new Schema<IEdit>({
     title: {
         type: String,
         required: [true, 'Title is required'],
-        unique: true,
         trim: true,
         maxlength: [100, 'Title cannot exceed 100 characters']
     },
@@ -54,6 +61,17 @@ const editSchema = new Schema<IEdit>({
     author: {
         type: String,
         trim: true,
+    },
+    userId: {
+        type: Number,
+        default: 0,
+        index: true
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending',
+        index: true
     },
     views: {
         type: Number,
