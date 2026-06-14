@@ -12,12 +12,12 @@ import swaggerRouter from './v2/swagger';
 // v2 routes
 import {
   health,
-  books  as booksV2,
-  songs  as songsV2,
-  users  as usersV2,
+  books as booksV2,
+  songs as songsV2,
+  users as usersV2,
   drafts as draftsV2,
-  edits  as editsV2,
-  listings      as listingsV2,
+  edits as editsV2,
+  listings as listingsV2,
   organisations as organisationsV2,
   reports,
 } from './v2/routes';
@@ -49,27 +49,26 @@ mongoose
 app.use(express.json({ limit: '50mb' }));
 
 // ── v1 routes
-app.use('/', home);
-app.use('/api', home);
-app.use('/api/users',         users);
-app.use('/api/books',         books);
-app.use('/api/songs',         songs);
-app.use('/api/drafts',        drafts);
-app.use('/api/edits',         edits);
-app.use('/api/listings',      listings);
-app.use('/api/organisations',  organisations);
+app.use('/api/users', users);
+app.use('/api/books', books);
+app.use('/api/songs', songs);
+app.use('/api/drafts', drafts);
+app.use('/api/edits', edits);
+app.use('/api/listings', listings);
+app.use('/api/organisations', organisations);
 
 // ── v2 routes 
-app.use('/api/v2/docs',          swaggerRouter);
-app.use('/api/v2/health',         health);
-app.use('/api/v2/books',          booksV2);
-app.use('/api/v2/songs',          songsV2);
-app.use('/api/v2/users',          usersV2);
-app.use('/api/v2/drafts',         draftsV2);
-app.use('/api/v2/edits',          editsV2);
-app.use('/api/v2/listings',       listingsV2);
-app.use('/api/v2/organisations',  organisationsV2);
-app.use('/api/v2/reports',        reports);
+app.use('/', swaggerRouter);
+app.use('/api', swaggerRouter);
+app.use('/api/v2/health', health);
+app.use('/api/v2/books', booksV2);
+app.use('/api/v2/songs', songsV2);
+app.use('/api/v2/users', usersV2);
+app.use('/api/v2/drafts', draftsV2);
+app.use('/api/v2/edits', editsV2);
+app.use('/api/v2/listings', listingsV2);
+app.use('/api/v2/organisations', organisationsV2);
+app.use('/api/v2/reports', reports);
 
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Unhandled error:', err);
