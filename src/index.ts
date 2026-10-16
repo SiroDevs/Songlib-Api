@@ -1,7 +1,10 @@
 import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import compression from 'compression';
 import dotenv from 'dotenv';
+
+import { Analytics } from "@vercel/analytics/next"
 
 // v2 swagger docs
 import swaggerRouter from './v2/swagger';
@@ -48,6 +51,9 @@ mongoose
   .connect(process.env.ATLAS_URI as string, { authSource: 'admin' })
   .then(() => console.log('MongoDB connected ...'))
   .catch((err) => console.error('MongoDB connection error:', err));
+
+// gzip responses: song lyrics are large, repetitive text and compress ~5-8x.
+app.use(compression());
 
 app.use(express.json({ limit: '50mb' }));
 

@@ -18,6 +18,9 @@
   ],
   "license": "ISC",
   "dependencies": {
+    "@types/compression": "^1.8.1",
+    "@vercel/analytics": "^2.0.1",
+    "compression": "^1.8.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.17.1",

@@ -25,16 +25,24 @@ export class SongService {
     const { page = 1, limit = 500, since } = query;
     const skip = (page - 1) * limit;
 
+    // Captured before querying so the client can use it as its next `since`
+    // cursor (server clock, not the phone's) without missing in-flight writes.
+    const serverTime = new Date().toISOString();
+
     const filter: any = { book: { $in: bookIds } };
     if (since) {
       const sinceDate = new Date(since);
       if (!isNaN(sinceDate.getTime())) {
-        filter.updated = { $gt: sinceDate };
+        // Older songs may have no `updated`; fall back to `created` for them.
+        filter.$or = [
+          { updated: { $gt: sinceDate } },
+          { updated: { $exists: false }, created: { $gt: sinceDate } },
+        ];
       }
     }
 
     const [songs, total] = await Promise.all([
-      Song.find(filter).select('-_id').sort('songId').skip(skip).limit(limit),
+      Song.find(filter).select('-_id -__v').sort('songId').skip(skip).limit(limit).lean(),
       Song.countDocuments(filter),
     ]);
 
@@ -46,6 +54,7 @@ export class SongService {
         total,
         totalPages: Math.ceil(total / limit),
         hasMore: page * limit < total,
+        serverTime,
       },
     };
   }
