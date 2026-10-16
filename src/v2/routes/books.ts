@@ -4,6 +4,7 @@ import { ResponseUtils } from '../utils/responseUtils';
 import { ValidationUtils } from '../utils/validationUtils';
 import { requireApiKey } from '../middleware/auth';
 import { readLimiter, writeLimiter, bulkLimiter } from '../middleware/rateLimit';
+import { edgeCache } from '../middleware/cache';
 
 const router = Router();
 
@@ -13,7 +14,7 @@ router.use(requireApiKey);
  * GET /api/v2/books
  * Returns all enabled books sorted by position.
  */
-router.get('/', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', edgeCache(600, 3600), readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const books = await BookService.getAllBooks();
     ResponseUtils.success(res, books);
@@ -27,11 +28,14 @@ router.get('/', readLimiter, async (req: Request, res: Response, next: NextFunct
  * Fetch one or more books by comma-separated IDs.
  * e.g. /api/v2/books/1,2,3
  */
-router.get('/:ids', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.get('/:ids', edgeCache(600, 3600), readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const ids = req.params.ids.split(',').map((id) => id.trim());
     if (ids.length === 0) {
       return ResponseUtils.badRequest(res, 'No valid book IDs provided');
+    }
+    if (ids.length > ValidationUtils.maxBooksPerRequest()) {
+      return ResponseUtils.badRequest(res, ValidationUtils.tooManyBooksMessage());
     }
     const books = await BookService.getBooksByIds(ids);
     ResponseUtils.success(res, books);

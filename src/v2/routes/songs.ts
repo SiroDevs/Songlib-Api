@@ -4,16 +4,39 @@ import { ResponseUtils } from '../utils/responseUtils';
 import { ValidationUtils } from '../utils/validationUtils';
 import { requireApiKey } from '../middleware/auth';
 import { readLimiter, writeLimiter, bulkLimiter } from '../middleware/rateLimit';
+import { edgeCache } from '../middleware/cache';
+import { SyncService } from '../services/syncService';
 
 const router = Router();
 
 router.use(requireApiKey);
 
 /**
+ * GET /api/v2/songs/sync-meta?books=1,3,7
+ * Tiny change-check payload: per book, the song count and last-updated time,
+ * plus serverTime to use as the next `since` cursor. Must be declared before
+ * `/:songId` so "sync-meta" is not parsed as an id.
+ */
+router.get('/sync-meta', edgeCache(120, 600), readLimiter, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const bookIds = ValidationUtils.parseIds(String(req.query.books ?? ''));
+    if (bookIds.length === 0) {
+      return ResponseUtils.badRequest(res, 'books query param is required, e.g. ?books=1,3,7');
+    }
+    if (bookIds.length > ValidationUtils.maxBooksPerRequest()) {
+      return ResponseUtils.badRequest(res, ValidationUtils.tooManyBooksMessage());
+    }
+    ResponseUtils.success(res, await SyncService.getBookMeta(bookIds));
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
  * GET /api/v2/songs/:songId
  * Fetch a single song by its ID.
  */
-router.get('/:songId', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.get('/:songId', edgeCache(300, 3600), readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const songId = parseInt(req.params.songId as string);
     if (!ValidationUtils.isValidId(songId)) {
@@ -43,11 +66,14 @@ router.get('/:songId', readLimiter, async (req: Request, res: Response, next: Ne
  * Example:
  *   /api/v2/songs/books/1,3,7?since=2025-01-01T00:00:00Z
  */
-router.get('/books/:bookIds', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.get('/books/:bookIds', edgeCache(300, 3600), readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const bookIds = ValidationUtils.parseBookIds(req.params.bookIds as string);
     if (bookIds.length === 0) {
       return ResponseUtils.badRequest(res, 'No valid book IDs provided');
+    }
+    if (bookIds.length > ValidationUtils.maxBooksPerRequest()) {
+      return ResponseUtils.badRequest(res, ValidationUtils.tooManyBooksMessage());
     }
 
     const { page, limit } = ValidationUtils.parsePagination(req.query);

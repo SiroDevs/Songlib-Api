@@ -13,6 +13,20 @@ export class ValidationUtils {
       .filter((id) => id.length > 0);
   }
 
+  /**
+   * Sanity bound on how many books a single request may name. Deliberately
+   * generous: per-app limits (e.g. SongLib's 10-songbook cap) belong in the
+   * apps, since ChurchLib shares this API. Override with MAX_BOOKS_PER_REQUEST.
+   */
+  static maxBooksPerRequest(): number {
+    const n = parseInt(process.env.MAX_BOOKS_PER_REQUEST ?? '', 10);
+    return Number.isFinite(n) && n > 0 ? n : 50;
+  }
+
+  static tooManyBooksMessage(): string {
+    return `Too many books requested (max ${ValidationUtils.maxBooksPerRequest()})`;
+  }
+
   static isValidId(id: any): boolean {
     const parsed = parseInt(id);
     return !isNaN(parsed) && parsed > 0;

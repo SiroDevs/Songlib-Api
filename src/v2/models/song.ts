@@ -72,9 +72,13 @@ const songSchema = new Schema<ISong>({
         default: Date.now
     },
     updated: {
-        type: Date
+        type: Date,
+        default: Date.now
     }
 });
+
+// Delta sync (`?since=`) and sync-meta both filter / aggregate by book + updated.
+songSchema.index({ book: 1, updated: 1 });
 
 export const Song = mongoose.model<ISong>('Song', songSchema);
 export default Song;
